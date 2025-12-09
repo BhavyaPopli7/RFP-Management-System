@@ -19,7 +19,7 @@ app.use("/api",rfpRoutes);
 app.use("/api",emailRoutes);
 
 app.get("/", (req, res) => {
-  res.json({ message: "API is running ✅" });
+  res.json({ message: "API is running" });
 });
 
 app.listen(PORT, () => {
