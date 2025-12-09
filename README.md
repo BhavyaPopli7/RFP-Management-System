@@ -36,7 +36,7 @@ cd backend
 npm install
 
 Create a backend/.env file:
-i have already created it just and values for each key
+i have already created it just add values for each key
 
 Start Backend:
 npm run dev
@@ -86,9 +86,22 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RfpSummary'
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    title:
+                      type: string
+                    budget:
+                      type: number
+                    deliveryDays:
+                      type: number
+                    paymentTerms:
+                      type: string
+                    warranty:
+                      type: string
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: Server error
 
   /generate/rfp:
     post:
@@ -104,17 +117,40 @@ paths:
               properties:
                 text:
                   type: string
+                  description: Natural language RFP description
       responses:
         '200':
           description: Generated structured RFP
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GeneratedRfp'
+                type: object
+                properties:
+                  title:
+                    type: string
+                  budget:
+                    type: number
+                  deliveryDays:
+                    type: number
+                  paymentTerms:
+                    type: string
+                  warranty:
+                    type: string
+                  lineItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        quantity:
+                          type: number
+                        spec:
+                          type: string
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Bad request
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: Server error
 
   /submit/rfp:
     post:
@@ -125,18 +161,69 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RfpCreate'
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                descriptionNlp:
+                  type: string
+                budget:
+                  type: number
+                deliveryDays:
+                  type: number
+                paymentTerms:
+                  type: string
+                warranty:
+                  type: string
+                lineItems:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      quantity:
+                        type: number
+                      spec:
+                        type: string
       responses:
         '201':
           description: RFP created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Rfp'
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  descriptionNlp:
+                    type: string
+                  budget:
+                    type: number
+                  deliveryDays:
+                    type: number
+                  paymentTerms:
+                    type: string
+                  warranty:
+                    type: string
+                  lineItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        quantity:
+                          type: number
+                        spec:
+                          type: string
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: Bad request
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: Server error
 
   /getrfp/{id}:
     get:
@@ -154,11 +241,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Rfp'
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  descriptionNlp:
+                    type: string
+                  budget:
+                    type: number
+                  deliveryDays:
+                    type: number
+                  paymentTerms:
+                    type: string
+                  warranty:
+                    type: string
+                  lineItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        quantity:
+                          type: number
+                        spec:
+                          type: string
+                  invitedVendors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vendor:
+                          type: string
+                        status:
+                          type: string
+                        sentAt:
+                          type: string
+                          format: date-time
         '404':
-          $ref: '#/components/responses/NotFound'
+          description: RFP not found
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: Server error
 
   /rfp/{id}:
     delete:
@@ -176,9 +301,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessMessage'
+                type: object
+                properties:
+                  message:
+                    type: string
         '404':
-          $ref: '#/components/responses/NotFound'
+          description: RFP not found
+        '500':
+          description: Server error
 
   /create/vendor:
     post:
@@ -189,14 +319,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VendorCreate'
+              type: object
+              required: [name, email]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
       responses:
         '201':
           description: Vendor created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Vendor'
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  phone:
+                    type: string
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
 
   /list/vendor:
     get:
@@ -210,7 +362,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Vendor'
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    email:
+                      type: string
+                    phone:
+                      type: string
+        '500':
+          description: Server error
 
   /vendor/{id}:
     delete:
@@ -228,7 +391,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessMessage'
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Vendor not found
+        '500':
+          description: Server error
 
   /rfp/{id}/invite-vendors:
     post:
@@ -255,6 +425,29 @@ paths:
       responses:
         '200':
           description: Vendors invited successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  invitedVendors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vendor:
+                          type: string
+                        status:
+                          type: string
+                        sentAt:
+                          type: string
+                          format: date-time
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
 
   /rfp/{rfpId}/vendor/{vendorId}/proposal:
     post:
@@ -287,80 +480,131 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Proposal'
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  rfp:
+                    type: string
+                  vendor:
+                    type: string
+                  totalPrice:
+                    type: number
+                  deliveryDays:
+                    type: number
+                  paymentTerms:
+                    type: string
+                  warranty:
+                    type: string
+                  aiSummary:
+                    type: string
+                  scoreOverall:
+                    type: number
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
 
-components:
-  schemas:
-    RfpSummary:
-      type: object
-      properties:
-        _id: { type: string }
-        title: { type: string }
-        budget: { type: number }
-        deliveryDays: { type: number }
-        paymentTerms: { type: string }
-        warranty: { type: string }
 
-    LineItem:
-      type: object
-      properties:
-        name: { type: string }
-        quantity: { type: number }
-        spec: { type: string }
+---
 
-    RfpCreate:
-      type: object
-      properties:
-        title: { type: string }
-        descriptionNlp: { type: string }
-        budget: { type: number }
-        deliveryDays: { type: number }
-        paymentTerms: { type: string }
-        warranty: { type: string }
-        lineItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/LineItem'
+# 4. 🤔 Decisions & Assumptions
 
-    Rfp:
-      allOf:
-        - $ref: '#/components/schemas/RfpCreate'
+This section outlines the key architectural decisions, model choices, workflow design, and assumptions made when building this AI-powered RFP system.
 
-    VendorCreate:
-      type: object
-      properties:
-        name: { type: string }
-        email: { type: string }
-        phone: { type: string }
+## 4.a. Key Design Decisions
 
-    Vendor:
-      allOf:
-        - $ref: '#/components/schemas/VendorCreate'
+### **1. Three-Model Database Structure**
+- **Rfp** → Holds structured RFP data generated by AI.
+- **Vendor** → Master data for all vendors.
+- **Proposal** → Stores parsed vendor email responses + AI scoring.
+  
+This separation keeps data clean, normalized, and easy to expand.
 
-    Proposal:
-      type: object
-      properties:
-        _id: { type: string }
-        rfp: { type: string }
-        vendor: { type: string }
-        totalPrice: { type: number }
-        deliveryDays: { type: number }
-        paymentTerms: { type: string }
-        warranty: { type: string }
-        aiSummary: { type: string }
-        scoreOverall: { type: number }
+### **2. Natural Language → Structured JSON Flow**
+All unstructured user input (RFP creation + vendor email) is passed through **Google Gemini** with a strict output schema.  
+This ensures the frontend always receives predictable JSON.
 
-    SuccessMessage:
-      type: object
-      properties:
-        message: { type: string }
+### **3. Proposal Comparison Logic**
+AI is used to:
+- Extract comparable fields (price, delivery days, warranty, terms)
+- Generate a **score (0–100)**
+- Produce a **final recommendation**
 
-  responses:
-    BadRequest:
-      description: Bad Request
-    NotFound:
-      description: Not Found
-    ServerError:
-      description: Server Error
+The decision to use AI for scoring instead of rule-based logic makes the system more generalizable.
+
+### **4. Email Sending but Simulated Email Receiving**
+Sending RFP emails uses Nodemailer.  
+For receiving emails, the system intentionally uses a **Vendor Response Simulator** to paste text instead of building Mailgun/SendGrid inbound parsing.  
+This simplifies the project scope while still showing AI parsing flow.
+
+### **5. Fetch-Based API Calls**
+The frontend uses native `fetch()` instead of Axios to keep the app lightweight and clear.
+
+---
+
+## 4.b. Assumptions Made
+
+### **1. Vendor Responses Are Text-Based**
+Assumed that vendors respond with readable text that AI can parse.  
+No PDF/OCR support added (but could be extended).
+
+### **2. No Authentication Needed**
+This is a **single-user demo**, so login/user accounts were intentionally excluded.
+
+### **3. Email Format Variability**
+Assumed emails may be messy or informal — AI is resilient enough to extract structured fields.
+
+### **4. RFP Structure Is Universal**
+Assumed all RFPs require:
+- Line items  
+- Budget  
+- Delivery timeline  
+- Payment terms  
+- Warranty  
+
+This can be extended per industry.
+
+### **5. Scoring Is AI-Driven**
+No manual override system was added.  
+AI determines:
+- Best vendor  
+- Reasoning  
+- Score breakdown  
+---
+
+# 5. 🧠 AI Tools Usage
+
+This project intentionally uses AI tools throughout development to accelerate workflow and improve design quality.
+
+## 5.a. Tools Used
+- **Google Gemini** → Core application AI (RFP parsing, proposal parsing, scoring)
+- **ChatGPT** → Architecture planning, debugging help, OpenAPI documentation
+---
+
+## 5.b. What These Tools Helped With
+
+### **1. Boilerplate Code Generation**
+Copilot + ChatGPT helped generate:
+- Router boilerplate  
+- Model skeletons  
+
+This reduced setup time significantly.
+
+### **2. Debugging and Error Explanation**
+AI tools helped quickly diagnose: 
+- Nodemailer SMTP configuration errors  
+- Incorrect JSON shapes returned by Gemini  
+
+### **3. Schema & Prompt Design**
+ChatGPT and Gemini both contributed to: 
+- Crafting stable prompts for consistent AI output  
+
+### **4. Improving UX Flow**
+AI helped refine decisions like:
+- Showing structured preview after generation  
+- Using a simulator for vendor responses  
+
+
 
 
